@@ -4,60 +4,103 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spice Garden Restaurant - w8r</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f9f9f9;
+      font-family: 'Inter', sans-serif;
+      background: #f6f8fa;
       margin: 0;
-      padding: 0 20px;
+      padding: 0;
+      color: #1c1e21;
     }
     header {
       text-align: center;
-      padding: 1rem 0;
+      padding: 1.2rem 1rem;
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
     header h1 {
       margin: 0;
+      font-size: 1.8rem;
     }
     header p {
-      margin: 4px 0;
+      margin: 0.25rem 0;
       font-size: 0.95rem;
       color: #666;
     }
-    h3 {
-      margin: 0;
+    .category-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 1rem;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .category-buttons button {
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      border-radius: 24px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .category-buttons button:hover,
+    .category-buttons button.active {
+      background: #0284c7;
+      color: white;
     }
     .category {
-      margin-top: 2rem;
+      margin: 2rem 0 0;
     }
     .category-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 0.8rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 1rem 0;
+      color: #333;
     }
     .menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
+      padding: 0 1rem 2rem;
     }
     .menu-item {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1rem 1.2rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 1.2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     .item-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    .item-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
     .item-price {
       font-weight: bold;
-      color: #2e7d32;
+      color: #059669;
     }
     .item-description {
       font-size: 0.95rem;
       color: #555;
-      margin: 0.5rem 0 1rem;
+      margin: 0.6rem 0 1rem;
     }
     .quantity-controls {
       display: flex;
@@ -65,23 +108,30 @@
       gap: 10px;
     }
     .quantity-btn {
-      padding: 4px 10px;
+      padding: 4px 12px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
-      background: #eee;
+      background: #f0f0f0;
       cursor: pointer;
     }
     .quantity-display {
       font-weight: bold;
+      min-width: 24px;
+      text-align: center;
     }
     .order-btn {
-      background-color: #2196f3;
+      background-color: #3b82f6;
       color: #fff;
       border: none;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+    .order-btn:hover {
+      background-color: #2563eb;
     }
     .order-section {
       display: flex;
@@ -94,30 +144,32 @@
       left: 0;
       right: 0;
       background: #fff;
-      border-top: 1px solid #ccc;
-      padding: 10px 20px;
+      border-top: 1px solid #e5e7eb;
+      padding: 12px 20px;
       display: none;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
+      z-index: 100;
     }
     .cart-summary.show {
       display: flex;
     }
     .checkout-btn {
-      background-color: #25d366;
+      background-color: #10b981;
       color: white;
       border: none;
-      padding: 8px 14px;
-      font-weight: bold;
+      padding: 8px 18px;
+      font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
     }
     .footer {
       text-align: center;
       font-size: 0.9rem;
-      padding: 1rem 0;
-      color: #777;
+      padding: 1.5rem 0;
+      color: #888;
+      background: #f1f5f9;
     }
   </style>
 </head>
@@ -127,9 +179,8 @@
     <p>Open daily: 11:00 AM – 10:30 PM</p>
   </header>
 
-  <div class="menu-section" id="menuSection">
-    Loading menu...
-  </div>
+  <div class="category-buttons" id="categoryButtons"></div>
+  <div class="menu-section" id="menuSection">Loading menu...</div>
 
   <div class="cart-summary" id="cartSummary">
     <div class="cart-total">Total: ₹<span id="cartTotal">0</span></div>
@@ -142,67 +193,93 @@
 
   <script>
     const MENU_JSON_URL = "menu.json";
-    let cart = {};
-    let total = 0;
+    let cart = {}, total = 0;
     const restaurantName = "Spice Garden Restaurant";
     const whatsappNumber = "919876543210";
+    let categories = {};
 
     fetch(MENU_JSON_URL)
       .then(res => res.json())
       .then(menuItems => {
-        const section = document.getElementById("menuSection");
-        section.innerHTML = "";
-
-        const categories = {};
         menuItems.forEach(item => {
           if (!item.Available) return;
           if (!categories[item.Category]) categories[item.Category] = [];
           categories[item.Category].push(item);
         });
-
-        Object.entries(categories).forEach(([category, items]) => {
-          const categoryDiv = document.createElement("div");
-          categoryDiv.className = "category";
-
-          const categoryTitle = document.createElement("div");
-          categoryTitle.className = "category-title";
-          categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
-
-          const grid = document.createElement("div");
-          grid.className = "menu-grid";
-
-          items.forEach(item => {
-            const card = document.createElement("div");
-            card.className = "menu-item";
-            card.setAttribute("data-category", item.Category);
-            card.setAttribute("data-item", item.Name);
-            card.innerHTML = `
-              <div class="item-header">
-                <div><h3 class="item-name">${item.Name}</h3></div>
-                <div class="item-price">₹${item.Price}</div>
-              </div>
-              <p class="item-description">${item.Description || ""}</p>
-              <div class="order-section">
-                <div class="quantity-controls">
-                  <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
-                  <span class="quantity-display">0</span>
-                  <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
-                </div>
-                <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add to Cart</button>
-              </div>
-            `;
-            grid.appendChild(card);
-          });
-
-          categoryDiv.appendChild(categoryTitle);
-          categoryDiv.appendChild(grid);
-          section.appendChild(categoryDiv);
-        });
-      })
-      .catch(err => {
-        document.getElementById("menuSection").innerHTML = `<p>Error loading menu. Please try again.</p>`;
-        console.error("menu.json load error", err);
+        renderCategoryButtons();
+        renderAllCategories();
       });
+
+    function renderCategoryButtons() {
+      const container = document.getElementById("categoryButtons");
+      container.innerHTML = '';
+      Object.keys(categories).forEach(cat => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        btn.onclick = () => renderSingleCategory(cat);
+        container.appendChild(btn);
+      });
+      const allBtn = document.createElement("button");
+      allBtn.textContent = "All";
+      allBtn.onclick = () => renderAllCategories();
+      allBtn.classList.add("active");
+      container.prepend(allBtn);
+    }
+
+    function renderSingleCategory(category) {
+      const section = document.getElementById("menuSection");
+      section.innerHTML = "";
+      const categoryDiv = document.createElement("div");
+      categoryDiv.className = "category";
+      const categoryTitle = document.createElement("div");
+      categoryTitle.className = "category-title";
+      categoryTitle.textContent = category;
+      const grid = document.createElement("div");
+      grid.className = "menu-grid";
+      categories[category].forEach(item => grid.appendChild(createMenuItem(item)));
+      categoryDiv.appendChild(categoryTitle);
+      categoryDiv.appendChild(grid);
+      section.appendChild(categoryDiv);
+    }
+
+    function renderAllCategories() {
+      const section = document.getElementById("menuSection");
+      section.innerHTML = "";
+      Object.entries(categories).forEach(([category, items]) => {
+        const categoryDiv = document.createElement("div");
+        categoryDiv.className = "category";
+        const categoryTitle = document.createElement("div");
+        categoryTitle.className = "category-title";
+        categoryTitle.textContent = category;
+        const grid = document.createElement("div");
+        grid.className = "menu-grid";
+        items.forEach(item => grid.appendChild(createMenuItem(item)));
+        categoryDiv.appendChild(categoryTitle);
+        categoryDiv.appendChild(grid);
+        section.appendChild(categoryDiv);
+      });
+    }
+
+    function createMenuItem(item) {
+      const card = document.createElement("div");
+      card.className = "menu-item";
+      card.setAttribute("data-item", item.Name);
+      card.innerHTML = `
+        <div class="item-header">
+          <div><h3 class="item-name">${item.Name}</h3></div>
+          <div class="item-price">₹${item.Price}</div>
+        </div>
+        <p class="item-description">${item.Description || ""}</p>
+        <div class="order-section">
+          <div class="quantity-controls">
+            <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
+            <span class="quantity-display">0</span>
+            <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
+          </div>
+          <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add to Cart</button>
+        </div>`;
+      return card;
+    }
 
     function updateQuantity(itemName, change) {
       const quantityDisplay = document.querySelector(`[data-item="${itemName}"] .quantity-display`);
@@ -224,8 +301,7 @@
     function updateCartDisplay() {
       total = Object.values(cart).reduce((sum, item) => sum + item.quantity * item.price, 0);
       document.getElementById("cartTotal").textContent = total;
-      const cartBox = document.getElementById("cartSummary");
-      cartBox.classList.toggle("show", total > 0);
+      document.getElementById("cartSummary").classList.toggle("show", total > 0);
     }
 
     function checkout() {
