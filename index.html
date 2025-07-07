@@ -137,6 +137,11 @@
     <p>Open daily: 11:00 AM – 10:30 PM</p>
   </header>
 
+  <!-- Search Bar -->
+  <div style="text-align:center; margin-top:1rem;">
+    <input type="text" id="searchInput" placeholder="Search for dishes..." style="width:80%; max-width:500px; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:1rem;">
+  </div>
+
   <div class="category-buttons" id="categoryButtons"></div>
   <div class="menu-section" id="menuSection">Loading menu...</div>
 
@@ -149,7 +154,7 @@
     <p class="footer-text">Powered by w8r - Digital Menu Solution</p>
   </div>
 
-  <!-- Modal -->
+  <!-- Cart Modal -->
   <div id="cartModal" style="display:none; position:fixed; top:10%; left:5%; right:5%; background:#fff; padding:1.2rem; box-shadow:0 5px 20px rgba(0,0,0,0.2); border-radius:12px; z-index:200; max-height:80vh; overflow:auto;">
     <h2 style="margin-top:0">🛒 Your Cart</h2>
     <div id="cartItems"></div>
@@ -163,7 +168,7 @@
     </div>
   </div>
 
-<script>
+  <script>
   const MENU_JSON_URL = "menu.json";
   let cart = JSON.parse(localStorage.getItem("cart")) || {};
   let total = 0;
@@ -335,6 +340,25 @@
     msg += `%0ATotal: ₹${total}%0APlease confirm my order.`;
     window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, '_blank');
   }
+
+  // Search functionality
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    const section = document.getElementById("menuSection");
+    section.innerHTML = "";
+    let foundAny = false;
+    Object.entries(categories).forEach(([cat, items]) => {
+      const matchedItems = items.filter(item => item.Name.toLowerCase().includes(query));
+      if (matchedItems.length > 0) {
+        foundAny = true;
+        section.appendChild(buildCategory(cat, matchedItems));
+      }
+    });
+    if (!foundAny) {
+      section.innerHTML = '<div style="text-align:center; font-size:1.2rem; color:#999; margin-top:2rem;">No results found 😕</div>';
+    }
+  });
 </script>
+  <!-- This will be filled with script content already finalized -->
 </body>
 </html>
