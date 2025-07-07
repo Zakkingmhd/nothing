@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kaymas Restaurant - w8r</title>
+  <title>Spice Garden Restaurant - w8r</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -11,11 +11,28 @@
       margin: 0;
       padding: 0 20px;
     }
+    header {
+      text-align: center;
+      padding: 1rem 0;
+    }
+    header h1 {
+      margin: 0;
+    }
+    header p {
+      margin: 4px 0;
+      font-size: 0.95rem;
+      color: #666;
+    }
     h3 {
       margin: 0;
     }
-    .menu-section {
-      padding: 2rem 0;
+    .category {
+      margin-top: 2rem;
+    }
+    .category-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.8rem;
     }
     .menu-grid {
       display: grid;
@@ -105,8 +122,13 @@
   </style>
 </head>
 <body>
-  <div class="menu-section">
-    <div class="menu-grid" id="menuGrid">Loading menu...</div>
+  <header>
+    <h1>Spice Garden Restaurant</h1>
+    <p>Open daily: 11:00 AM – 10:30 PM</p>
+  </header>
+
+  <div class="menu-section" id="menuSection">
+    Loading menu...
   </div>
 
   <div class="cart-summary" id="cartSummary">
@@ -119,43 +141,66 @@
   </div>
 
   <script>
-    const MENU_JSON_URL = "menu.json"; // Replace with full path if needed
+    const MENU_JSON_URL = "menu.json";
     let cart = {};
     let total = 0;
-    const restaurantName = "Kaymas Restaurant";
-    const whatsappNumber = "919744103674";
+    const restaurantName = "Spice Garden Restaurant";
+    const whatsappNumber = "919876543210";
 
     fetch(MENU_JSON_URL)
       .then(res => res.json())
       .then(menuItems => {
-        const grid = document.getElementById("menuGrid");
-        grid.innerHTML = "";
+        const section = document.getElementById("menuSection");
+        section.innerHTML = "";
+
+        const categories = {};
         menuItems.forEach(item => {
           if (!item.Available) return;
-          const card = document.createElement("div");
-          card.className = "menu-item";
-          card.setAttribute("data-category", item.Category);
-          card.setAttribute("data-item", item.Name);
-          card.innerHTML = `
-            <div class="item-header">
-              <div><h3 class="item-name">${item.Name}</h3></div>
-              <div class="item-price">₹${item.Price}</div>
-            </div>
-            <p class="item-description">${item.Description || ""}</p>
-            <div class="order-section">
-              <div class="quantity-controls">
-                <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
-                <span class="quantity-display">0</span>
-                <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
+          if (!categories[item.Category]) categories[item.Category] = [];
+          categories[item.Category].push(item);
+        });
+
+        Object.entries(categories).forEach(([category, items]) => {
+          const categoryDiv = document.createElement("div");
+          categoryDiv.className = "category";
+
+          const categoryTitle = document.createElement("div");
+          categoryTitle.className = "category-title";
+          categoryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+
+          const grid = document.createElement("div");
+          grid.className = "menu-grid";
+
+          items.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "menu-item";
+            card.setAttribute("data-category", item.Category);
+            card.setAttribute("data-item", item.Name);
+            card.innerHTML = `
+              <div class="item-header">
+                <div><h3 class="item-name">${item.Name}</h3></div>
+                <div class="item-price">₹${item.Price}</div>
               </div>
-              <button class="order-btn" onclick="order('${item.Name}', ${item.Price})">Add to Cart</button>
-            </div>
-          `;
-          grid.appendChild(card);
+              <p class="item-description">${item.Description || ""}</p>
+              <div class="order-section">
+                <div class="quantity-controls">
+                  <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
+                  <span class="quantity-display">0</span>
+                  <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
+                </div>
+                <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add to Cart</button>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+
+          categoryDiv.appendChild(categoryTitle);
+          categoryDiv.appendChild(grid);
+          section.appendChild(categoryDiv);
         });
       })
       .catch(err => {
-        document.getElementById("menuGrid").innerHTML = `<p>Error loading menu. Please try again.</p>`;
+        document.getElementById("menuSection").innerHTML = `<p>Error loading menu. Please try again.</p>`;
         console.error("menu.json load error", err);
       });
 
@@ -164,11 +209,16 @@
       let currentQuantity = parseInt(quantityDisplay.textContent);
       currentQuantity = Math.max(0, currentQuantity + change);
       quantityDisplay.textContent = currentQuantity;
+    }
 
-      const price = parseInt(document.querySelector(`[data-item="${itemName}"] .item-price`).textContent.replace('₹',''));
-      if (currentQuantity === 0) delete cart[itemName];
-      else cart[itemName] = { quantity: currentQuantity, price };
-      updateCartDisplay();
+    function addToCart(itemName, price) {
+      const quantity = parseInt(document.querySelector(`[data-item="${itemName}"] .quantity-display`).textContent);
+      if (quantity > 0) {
+        cart[itemName] = { quantity, price };
+        updateCartDisplay();
+      } else {
+        alert("Please select a quantity before adding to cart.");
+      }
     }
 
     function updateCartDisplay() {
@@ -187,10 +237,7 @@
       message += `%0ATotal: ₹${total}%0APlease confirm my order.`;
       window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
     }
-
-    function order(itemName, price) {
-      updateQuantity(itemName, 1);
-    }
   </script>
 </body>
 </html>
+
