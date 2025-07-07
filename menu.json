@@ -1,0 +1,44 @@
+[
+  {
+    "Name": "Chicken Biryani",
+    "Price": 250,
+    "Description": "Fragrant rice with marinated chicken cooked in traditional spices",
+    "Category": "biryani",
+    "Available": true
+  },
+  {
+    "Name": "Veg Biryani",
+    "Price": 200,
+    "Description": "Aromatic basmati rice layered with fresh vegetables and herbs",
+    "Category": "biryani",
+    "Available": true
+  },
+  {
+    "Name": "Paneer Tikka",
+    "Price": 180,
+    "Description": "Grilled paneer cubes marinated in tandoori spices",
+    "Category": "appetizers",
+    "Available": true
+  },
+  {
+    "Name": "Chicken 65",
+    "Price": 190,
+    "Description": "Spicy fried chicken bites served with curry leaves and chili",
+    "Category": "appetizers",
+    "Available": false
+  },
+  {
+    "Name": "Butter Chicken",
+    "Price": 280,
+    "Description": "Tender chicken cooked in a creamy tomato butter sauce",
+    "Category": "mains",
+    "Available": true
+  },
+  {
+    "Name": "Lassi",
+    "Price": 60,
+    "Description": "Chilled yogurt-based drink served sweet or salty",
+    "Category": "drinks",
+    "Available": true
+  }
+]
