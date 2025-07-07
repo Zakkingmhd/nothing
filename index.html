@@ -6,9 +6,7 @@
   <title>Spice Garden Restaurant - w8r</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Inter', sans-serif;
       background: #f6f8fa;
@@ -22,15 +20,6 @@
       background: #ffffff;
       box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.8rem;
-    }
-    header p {
-      margin: 0.25rem 0;
-      font-size: 0.95rem;
-      color: #666;
-    }
     .category-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -41,7 +30,6 @@
       position: sticky;
       top: 0;
       z-index: 99;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
     .category-buttons button {
       padding: 8px 16px;
@@ -52,22 +40,16 @@
       border: none;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
     }
-    .category-buttons button:hover,
     .category-buttons button.active {
       background: #0284c7;
       color: white;
-    }
-    .category {
-      margin: 2rem 0 0;
     }
     .category-title {
       font-size: 1.4rem;
       font-weight: 600;
       text-align: center;
       margin: 1rem 0;
-      color: #333;
     }
     .menu-grid {
       display: grid;
@@ -76,13 +58,10 @@
       padding: 0 1rem 2rem;
     }
     .menu-item {
-      background: #ffffff;
+      background: #fff;
       border-radius: 16px;
       padding: 1.2rem;
       box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
     }
     .item-header {
       display: flex;
@@ -109,34 +88,18 @@
     }
     .quantity-btn {
       padding: 4px 12px;
-      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       background: #f0f0f0;
       cursor: pointer;
     }
-    .quantity-display {
-      font-weight: bold;
-      min-width: 24px;
-      text-align: center;
-    }
     .order-btn {
-      background-color: #3b82f6;
-      color: #fff;
+      background: #3b82f6;
+      color: white;
       border: none;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
-      transition: background 0.3s;
-    }
-    .order-btn:hover {
-      background-color: #2563eb;
-    }
-    .order-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
     .cart-summary {
       position: fixed;
@@ -149,18 +112,14 @@
       display: none;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 -1px 5px rgba(0,0,0,0.05);
       z-index: 100;
     }
-    .cart-summary.show {
-      display: flex;
-    }
+    .cart-summary.show { display: flex; }
     .checkout-btn {
-      background-color: #10b981;
+      background: #10b981;
       color: white;
+      padding: 8px 16px;
       border: none;
-      padding: 8px 18px;
-      font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
     }
@@ -168,7 +127,6 @@
       text-align: center;
       font-size: 0.9rem;
       padding: 1.5rem 0;
-      color: #888;
       background: #f1f5f9;
     }
   </style>
@@ -183,12 +141,26 @@
   <div class="menu-section" id="menuSection">Loading menu...</div>
 
   <div class="cart-summary" id="cartSummary">
-    <div class="cart-total">Total: ₹<span id="cartTotal">0</span></div>
-    <button class="checkout-btn" onclick="checkout()">Order via WhatsApp</button>
+    <div>Total: ₹<span id="cartTotal">0</span></div>
+    <button class="checkout-btn" onclick="openCartModal()">View Cart</button>
   </div>
 
   <div class="footer">
     <p class="footer-text">Powered by w8r - Digital Menu Solution</p>
+  </div>
+
+  <!-- Modal -->
+  <div id="cartModal" style="display:none; position:fixed; top:10%; left:5%; right:5%; background:#fff; padding:1.2rem; box-shadow:0 5px 20px rgba(0,0,0,0.2); border-radius:12px; z-index:200; max-height:80vh; overflow:auto;">
+    <h2 style="margin-top:0">🛒 Your Cart</h2>
+    <div id="cartItems"></div>
+    <div style="margin-top:1rem; display:flex; justify-content:space-between; align-items:center;">
+      <strong>Total: ₹<span id="cartModalTotal">0</span></strong>
+      <div>
+        <button onclick="checkout()" style="background:#10b981; color:white; padding:8px 16px; border:none; border-radius:6px;">Checkout</button>
+        <button onclick="clearCart()" style="background:#ef4444; color:white; padding:8px 16px; border:none; border-radius:6px;">Clear Cart</button>
+        <button onclick="closeCartModal()" style="background:#6b7280; color:white; padding:8px 16px; border:none; border-radius:6px;">Close</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -200,11 +172,11 @@
 
     fetch(MENU_JSON_URL)
       .then(res => res.json())
-      .then(menuItems => {
-        menuItems.forEach(item => {
-          if (!item.Available) return;
-          if (!categories[item.Category]) categories[item.Category] = [];
-          categories[item.Category].push(item);
+      .then(data => {
+        data.forEach(item => {
+          const cat = item.Category.charAt(0).toUpperCase() + item.Category.slice(1);
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(item);
         });
         renderCategoryButtons();
         renderAllCategories();
@@ -212,108 +184,149 @@
 
     function renderCategoryButtons() {
       const container = document.getElementById("categoryButtons");
-      container.innerHTML = '';
+      container.innerHTML = "";
+      const allBtn = document.createElement("button");
+      allBtn.textContent = "All";
+      allBtn.classList.add("active");
+      allBtn.onclick = () => {
+        setActive("All");
+        renderAllCategories();
+      };
+      container.appendChild(allBtn);
+
       Object.keys(categories).forEach(cat => {
         const btn = document.createElement("button");
         btn.textContent = cat;
-        btn.onclick = () => renderSingleCategory(cat);
+        btn.onclick = () => {
+          setActive(cat);
+          renderSingleCategory(cat);
+        };
         container.appendChild(btn);
       });
-      const allBtn = document.createElement("button");
-      allBtn.textContent = "All";
-      allBtn.onclick = () => renderAllCategories();
-      allBtn.classList.add("active");
-      container.prepend(allBtn);
     }
 
-    function renderSingleCategory(category) {
-      const section = document.getElementById("menuSection");
-      section.innerHTML = "";
-      const categoryDiv = document.createElement("div");
-      categoryDiv.className = "category";
-      const categoryTitle = document.createElement("div");
-      categoryTitle.className = "category-title";
-      categoryTitle.textContent = category;
-      const grid = document.createElement("div");
-      grid.className = "menu-grid";
-      categories[category].forEach(item => grid.appendChild(createMenuItem(item)));
-      categoryDiv.appendChild(categoryTitle);
-      categoryDiv.appendChild(grid);
-      section.appendChild(categoryDiv);
+    function setActive(cat) {
+      document.querySelectorAll(".category-buttons button").forEach(b => {
+        b.classList.toggle("active", b.textContent === cat);
+      });
     }
 
     function renderAllCategories() {
       const section = document.getElementById("menuSection");
       section.innerHTML = "";
-      Object.entries(categories).forEach(([category, items]) => {
-        const categoryDiv = document.createElement("div");
-        categoryDiv.className = "category";
-        const categoryTitle = document.createElement("div");
-        categoryTitle.className = "category-title";
-        categoryTitle.textContent = category;
-        const grid = document.createElement("div");
-        grid.className = "menu-grid";
-        items.forEach(item => grid.appendChild(createMenuItem(item)));
-        categoryDiv.appendChild(categoryTitle);
-        categoryDiv.appendChild(grid);
-        section.appendChild(categoryDiv);
+      Object.entries(categories).forEach(([cat, items]) => {
+        section.appendChild(buildCategory(cat, items));
       });
     }
 
-    function createMenuItem(item) {
-      const card = document.createElement("div");
-      card.className = "menu-item";
-      card.setAttribute("data-item", item.Name);
-      card.innerHTML = `
-        <div class="item-header">
-          <div><h3 class="item-name">${item.Name}</h3></div>
-          <div class="item-price">₹${item.Price}</div>
-        </div>
-        <p class="item-description">${item.Description || ""}</p>
-        <div class="order-section">
+    function renderSingleCategory(cat) {
+      const section = document.getElementById("menuSection");
+      section.innerHTML = "";
+      section.appendChild(buildCategory(cat, categories[cat]));
+    }
+
+    function buildCategory(title, items) {
+      const div = document.createElement("div");
+      div.innerHTML = `<div class='category-title'>${title}</div>`;
+      const grid = document.createElement("div");
+      grid.className = "menu-grid";
+      items.forEach(item => {
+        if (!item.Available) return;
+        const card = document.createElement("div");
+        card.className = "menu-item";
+        card.setAttribute("data-item", item.Name);
+        card.innerHTML = `
+          <div class="item-header">
+            <div><h3 class="item-name">${item.Name}</h3></div>
+            <div class="item-price">₹${item.Price}</div>
+          </div>
+          <p class="item-description">${item.Description || ""}</p>
           <div class="quantity-controls">
             <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
             <span class="quantity-display">0</span>
             <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
+            <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add</button>
           </div>
-          <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add to Cart</button>
-        </div>`;
-      return card;
+        `;
+        grid.appendChild(card);
+      });
+      div.appendChild(grid);
+      return div;
     }
 
     function updateQuantity(itemName, change) {
-      const quantityDisplay = document.querySelector(`[data-item="${itemName}"] .quantity-display`);
-      let currentQuantity = parseInt(quantityDisplay.textContent);
-      currentQuantity = Math.max(0, currentQuantity + change);
-      quantityDisplay.textContent = currentQuantity;
+      const display = document.querySelector(`[data-item='${itemName}'] .quantity-display`);
+      let count = parseInt(display.textContent);
+      count = Math.max(0, count + change);
+      display.textContent = count;
     }
 
-    function addToCart(itemName, price) {
-      const quantity = parseInt(document.querySelector(`[data-item="${itemName}"] .quantity-display`).textContent);
-      if (quantity > 0) {
-        cart[itemName] = { quantity, price };
+    function addToCart(name, price) {
+      const qty = parseInt(document.querySelector(`[data-item='${name}'] .quantity-display`).textContent);
+      if (qty > 0) {
+        cart[name] = { quantity: qty, price };
         updateCartDisplay();
-      } else {
-        alert("Please select a quantity before adding to cart.");
       }
     }
 
     function updateCartDisplay() {
-      total = Object.values(cart).reduce((sum, item) => sum + item.quantity * item.price, 0);
+      total = Object.values(cart).reduce((s, { quantity, price }) => s + quantity * price, 0);
       document.getElementById("cartTotal").textContent = total;
       document.getElementById("cartSummary").classList.toggle("show", total > 0);
     }
 
-    function checkout() {
-      if (Object.keys(cart).length === 0) return alert("Your cart is empty!");
-      let message = `Hello! I'd like to order from ${restaurantName}:%0A`;
-      for (const [item, details] of Object.entries(cart)) {
-        message += `${details.quantity}x ${item} - ₹${details.quantity * details.price}%0A`;
+    function openCartModal() {
+      const modal = document.getElementById("cartModal");
+      const cartItemsDiv = document.getElementById("cartItems");
+      const cartModalTotal = document.getElementById("cartModalTotal");
+      cartItemsDiv.innerHTML = "";
+      let tempTotal = 0;
+      for (const [name, { quantity, price }] of Object.entries(cart)) {
+        const itemDiv = document.createElement("div");
+        itemDiv.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <div><strong>${name}</strong><br/>₹${price} x ${quantity} = ₹${price * quantity}</div>
+            <div>
+              <button onclick=\"adjustCartQuantity('${name}', -1)\">-</button>
+              <span>${quantity}</span>
+              <button onclick=\"adjustCartQuantity('${name}', 1)\">+</button>
+            </div>
+          </div>`;
+        cartItemsDiv.appendChild(itemDiv);
+        tempTotal += price * quantity;
       }
-      message += `%0ATotal: ₹${total}%0APlease confirm my order.`;
-      window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+      cartModalTotal.textContent = tempTotal;
+      modal.style.display = \"block\";
+    }
+
+    function closeCartModal() {
+      document.getElementById(\"cartModal\").style.display = \"none\";
+    }
+
+    function clearCart() {
+      cart = {};
+      total = 0;
+      updateCartDisplay();
+      closeCartModal();
+    }
+
+    function adjustCartQuantity(name, delta) {
+      if (!cart[name]) return;
+      cart[name].quantity += delta;
+      if (cart[name].quantity <= 0) delete cart[name];
+      updateCartDisplay();
+      openCartModal();
+    }
+
+    function checkout() {
+      if (Object.keys(cart).length === 0) return alert(\"Your cart is empty!\");
+      let msg = `Hello! I'd like to order from ${restaurantName}:%0A`;
+      for (const [item, d] of Object.entries(cart)) {
+        msg += `${d.quantity}x ${item} - ₹${d.quantity * d.price}%0A`;
+      }
+      msg += `%0ATotal: ₹${total}%0APlease confirm my order.`;
+      window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, '_blank');
     }
   </script>
 </body>
 </html>
-
