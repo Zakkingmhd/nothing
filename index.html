@@ -165,7 +165,8 @@
 
 <script>
   const MENU_JSON_URL = "menu.json";
-  let cart = {}, total = 0;
+  let cart = JSON.parse(localStorage.getItem("cart")) || {};
+  let total = 0;
   const restaurantName = "Spice Garden Restaurant";
   const whatsappNumber = "919876543210";
   let categories = {};
@@ -180,6 +181,7 @@
       });
       renderCategoryButtons();
       renderAllCategories();
+      updateCartDisplay();
     });
 
   function renderCategoryButtons() {
@@ -235,6 +237,7 @@
       const card = document.createElement("div");
       card.className = "menu-item";
       card.setAttribute("data-item", item.Name);
+      const qty = cart[item.Name]?.quantity || 0;
       card.innerHTML = `
         <div class="item-header">
           <div><h3 class="item-name">${item.Name}</h3></div>
@@ -243,7 +246,7 @@
         <p class="item-description">${item.Description || ""}</p>
         <div class="quantity-controls">
           <button class="quantity-btn" onclick="updateQuantity('${item.Name}', -1)">-</button>
-          <span class="quantity-display">0</span>
+          <span class="quantity-display">${qty}</span>
           <button class="quantity-btn" onclick="updateQuantity('${item.Name}', 1)">+</button>
           <button class="order-btn" onclick="addToCart('${item.Name}', ${item.Price})">Add</button>
         </div>
@@ -265,11 +268,14 @@
     const qty = parseInt(document.querySelector(`[data-item='${name}'] .quantity-display`).textContent);
     if (qty > 0) {
       cart[name] = { quantity: qty, price };
-      updateCartDisplay();
+    } else {
+      delete cart[name];
     }
+    updateCartDisplay();
   }
 
   function updateCartDisplay() {
+    localStorage.setItem("cart", JSON.stringify(cart));
     total = Object.values(cart).reduce((s, { quantity, price }) => s + quantity * price, 0);
     document.getElementById("cartTotal").textContent = total;
     document.getElementById("cartSummary").classList.toggle("show", total > 0);
@@ -306,8 +312,10 @@
   function clearCart() {
     cart = {};
     total = 0;
+    localStorage.removeItem("cart");
     updateCartDisplay();
     closeCartModal();
+    document.querySelectorAll(".quantity-display").forEach(q => q.textContent = "0");
   }
 
   function adjustCartQuantity(name, delta) {
